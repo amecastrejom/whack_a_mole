@@ -13,11 +13,13 @@ public class Jugador {
     private String id;
     private int juego;
     private int puntaje;
+    private int partidas_ganadas;
 
     public Jugador(String id, int juego) {
         this.id = id;
         this.juego = juego;
         this.puntaje =0;
+        this.partidas_ganadas = 0;
     }
     
     
@@ -38,14 +40,27 @@ public class Jugador {
         return puntaje;
     }
 
-    public void reset(){
+    public int getPartidas_ganadas() {
+        return partidas_ganadas;
+    }
+    
+    public void reset(int juego){
         puntaje = 0;
-        juego = 0;
+        this.juego = juego;
+        
+    }
+    public void restart(){
+        reset(1);
+        partidas_ganadas = 0;
     }
     
     public void ganar(){
         puntaje++;
     }  
+    
+    public void ganar_partida(){
+        partidas_ganadas++;
+    }
     
     
 }
