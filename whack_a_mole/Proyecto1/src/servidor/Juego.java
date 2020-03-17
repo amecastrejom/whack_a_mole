@@ -29,6 +29,10 @@ public class Juego {
     public int getActual() {
         return actual;
     }
+    
+    public int numJugadores(){
+        return ocupados;
+    }
 
     public void next_ronda(int juego) {
         if (juego < partidas){
@@ -42,9 +46,18 @@ public class Juego {
             reiniciar();
     }
     
+    public String buscar_address(String address){
+        String resp = "";
+        if (ocupados > 0){
+            for(int i=0; i < ocupados; i++){
+                if(jugadores[i].getAddress()== address)
+                resp = jugadores[i].getId();
+            }
+        }
+        return resp;
+    }
     
-    
-    private int buscar_jugador(String id){
+    public int buscar_jugador(String id){
         int resp = -1;
         if (ocupados > 0){
             for(int i=0; i < ocupados; i++){
@@ -55,12 +68,12 @@ public class Juego {
         return resp;
     }
     
-    public int agregar_jugador(String id){
+    public int agregar_jugador(String id, String address){
         int resp = -1;//tablero lleno
         if(ocupados < tam){
             int pos = buscar_jugador(id);
             if(pos == -1){
-                Jugador jug = new Jugador(id,actual);
+                Jugador jug = new Jugador(id,actual,address);
                 jugadores[ocupados]=jug;
                 resp = 1;//agregado
             }else{
@@ -175,3 +188,5 @@ public class Juego {
             ganar_partida();
         }
     }
+    
+}
