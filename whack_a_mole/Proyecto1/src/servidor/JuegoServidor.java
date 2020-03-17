@@ -48,7 +48,6 @@ public class JuegoServidor {
         
         String ganador = juego.ganador_juego();
         //mandar ganador
-
     }
     
     
@@ -114,16 +113,15 @@ class MandarTablero extends Thread{
 
  	}
          catch (SocketException e){
-             System.out.println("Socket: " + e.getMessage());
+             System.out.println("Socket topo: " + e.getMessage());
 	 }catch (InterruptedException ex) {
             Logger.getLogger(MandarTablero.class.getName()).log(Level.SEVERE, null, ex);
         }catch (IOException e){
-             System.out.println("IO: " + e.getMessage());
+             System.out.println("IO topo: " + e.getMessage());
          }
 	 finally {
             if(s != null) s.close();
         }
-
     }
 }
 
@@ -148,7 +146,8 @@ class EscuchaJugada extends Thread{
  		while(true){
                    System.out.println("Waiting for messages..."); 
  		   DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-  		   aSocket.receive(request);   
+  		   aSocket.receive(request);
+      System.out.println("Se recibió el mensaje:" + new String(request.getData())+ " from: "+ request.getAddress());
                    String jugada = new String(request.getData());
                    int seleccionado = Integer.parseInt(jugada);
                            
