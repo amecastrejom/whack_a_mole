@@ -19,10 +19,12 @@ public class JuegoServidor {
     private static Juego juego;
     private static int tam;
     private static int partidas;
+    private static int puntaje_meta;
 
     public static void main(String args[]) throws IOException {
         tam = 5;
-        partidas = 5;       
+        partidas = 3;    
+        puntaje_meta = 5;
         juego = new Juego(tam,partidas);
         
         //paramulticast(udp)
@@ -31,6 +33,19 @@ public class JuegoServidor {
         new NuevosJugadores(juego).start();
         new MandarTablero(juego).start();
         new EscuchaJugada(juego).start(); 
+        
+        int actual = juego.getActual();
+        while(actual <= partidas){
+            int puntajeMax = juego.getMaxPuntaje();
+            if(puntaje_meta == puntajeMax){
+                juego.acabarPartida();
+            }          
+            actual = juego.getActual();
+        }
+        
+        String ganador = juego.ganador_juego();
+        //mandar ganador
+
     }
     
     
