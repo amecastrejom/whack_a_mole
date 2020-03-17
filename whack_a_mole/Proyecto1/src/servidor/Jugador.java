@@ -13,13 +13,20 @@ public class Jugador {
     private String id;
     private int juego;
     private int puntaje;
+    private int partidas_ganadas;
+    private String address;
 
-    public Jugador(String id, int juego) {
+    public Jugador(String id, int juego, String address) {
         this.id = id;
         this.juego = juego;
         this.puntaje =0;
+        this.partidas_ganadas = 0;
+        this.address = address;
     }
-    
+
+    public String getAddress() {
+        return address;
+    }
     
 
     public String getId() {
@@ -38,14 +45,27 @@ public class Jugador {
         return puntaje;
     }
 
-    public void reset(){
+    public int getPartidas_ganadas() {
+        return partidas_ganadas;
+    }
+    
+    public void reset(int juego){
         puntaje = 0;
-        juego = 0;
+        this.juego = juego;
+        
+    }
+    public void restart(){
+        reset(1);
+        partidas_ganadas = 0;
     }
     
     public void ganar(){
         puntaje++;
     }  
+    
+    public void ganar_partida(){
+        partidas_ganadas++;
+    }
     
     
 }
