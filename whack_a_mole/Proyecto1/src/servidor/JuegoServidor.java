@@ -31,6 +31,8 @@ public class JuegoServidor {
         new NuevosJugadores(juego).start();
         new MandarTablero(juego).start();
         new EscuchaJugada(juego).start(); 
+        MandarTablero mt = new MandarTablero(juego);
+        mt.run();
     }
     
     
@@ -68,9 +70,10 @@ class MandarTablero extends Thread{
     }
     
     @Override
-    public void run(){ 
+    public void run(){
         MulticastSocket s = null;
          try {
+             while(true){
              InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group
              int topoActual = juego.getTopo();
              TimeUnit.SECONDS.sleep(3);
@@ -83,21 +86,21 @@ class MandarTablero extends Thread{
                  byte [] m = topo.getBytes(); 
                  DatagramPacket messageOut = 
                         new DatagramPacket(m, m.length, group, 6789);
-                 s.send(messageOut);   
+                 s.send(messageOut);  
              }
             s.leaveGroup(group);
+             }
  	    }
          catch (SocketException e){
-             System.out.println("Socket: " + e.getMessage());
+             System.out.println("Socket topo: " + e.getMessage());
 	 }catch (InterruptedException ex) {
             Logger.getLogger(MandarTablero.class.getName()).log(Level.SEVERE, null, ex);
         }catch (IOException e){
-             System.out.println("IO: " + e.getMessage());
+             System.out.println("IO topo: " + e.getMessage());
          }
 	 finally {
             if(s != null) s.close();
         }
-
     }
 }
 
@@ -118,7 +121,8 @@ class EscuchaJugada extends Thread{
  		while(true){
                    System.out.println("Waiting for messages..."); 
  		   DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-  		   aSocket.receive(request);     
+  		   aSocket.receive(request); 
+                   System.out.println("Se recibió el mensaje:" + new String(request.getData())+ " from: "+ request.getAddress());
                    
     		   DatagramPacket reply = new 
                         DatagramPacket( request.getData(), 
@@ -126,7 +130,6 @@ class EscuchaJugada extends Thread{
                                         request.getAddress(),
                                         request.getPort());
                    
-                   System.out.println("Server received a request from "+ request.getAddress());
 		   aSocket.send(reply);
 		}
 	   }

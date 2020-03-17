@@ -18,6 +18,7 @@ public class gui_juego extends javax.swing.JFrame {
     private static int udpSocket;
     private static String multiGroup;
     int casilla = 0;
+    String posTopo;
     /**
      * Creates new form gui_juego
      */
@@ -26,6 +27,20 @@ public class gui_juego extends javax.swing.JFrame {
         this.udpSocket = udpSocket;
         this.multiGroup = multiGroup;
         System.out.print("casilla" +casilla);
+    }
+    gui_juego() {
+        
+    }
+
+    public void setPosTopo(String posTopo) {
+        this.posTopo = posTopo;
+        System.out.println(this.posTopo);
+        update();
+    }
+    
+    
+    public void update(){
+        
     }
 
     /**
