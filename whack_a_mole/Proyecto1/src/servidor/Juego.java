@@ -81,18 +81,11 @@ public class Juego {
         }     
     }
    
-    public void reiniciar_jugador(String id){
-        int pos = buscar_jugador(id);
-        if(pos != -1){
-            jugadores[pos].reset();
-        }
-    }
-    
     public void reiniciar(){
         this.actual = 1;
         if (ocupados > 0){
             for(int i=0; i<ocupados; i++){
-                jugadores[i].reset();
+                jugadores[i].restart();
             }
         }
     }
@@ -115,14 +108,52 @@ public class Juego {
         }     
     }
     
+    public void ganar_partida(){
+        if(ocupados > 0){   
+            String id = ganador_partida();
+            int pos = buscar_jugador(id);
+            if(pos != -1){
+                jugadores[pos].ganar_partida();
+            }
+            for(int i = 0; i < ocupados; i++){
+                jugadores[i].reset(actual);
+            }
+        }  
+    }
     
-    public String ganador(){
+    public int getMaxPuntaje(){
+        int resp = -1;
+        if (ocupados>0){
+            for (int i=0; i<ocupados; i++){
+                if(jugadores[i].getPuntaje() > resp){
+                    resp = jugadores[i].getPuntaje();
+                }                
+            }
+        }
+        return resp;
+    } 
+    
+    public String ganador_partida(){
         String resp ="sin ganador";
         if (ocupados>0){
             int max = -1;
             for (int i=0; i<ocupados; i++){
                 if(jugadores[i].getPuntaje() > max){
                     max = jugadores[i].getPuntaje();
+                    resp = jugadores[i].getId();
+                }                
+            }
+        }
+        return resp;
+    }    
+    
+    public String ganador_juego(){
+        String resp ="sin ganador";
+        if (ocupados>0){
+            int max = -1;
+            for (int i=0; i<ocupados; i++){
+                if(jugadores[i].getPartidas_ganadas() > max){
+                    max = jugadores[i].getPartidas_ganadas();
                     resp = jugadores[i].getId();
                 }                
             }
@@ -138,4 +169,9 @@ public class Juego {
         return resp;
     }
     
-}
+    public void acabarPartida(){
+        if(ocupados > 0){
+            actual++;
+            ganar_partida();
+        }
+    }
