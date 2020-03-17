@@ -7,6 +7,8 @@ package servidor;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,12 @@ public class JuegoServidor {
     private static int tam;
     private static int partidas;
     private static int puntaje_meta;
+
+    public static int getPuntaje_meta() {
+        return puntaje_meta;
+    }
+    
+    
 
     public static void main(String args[]) throws IOException {
         tam = 5;
@@ -129,6 +137,7 @@ class EscuchaJugada extends Thread{
     private Juego juego;
     private InetAddress group;
     MulticastSocket s;
+    Map<String, Integer> hash_table = new HashMap<>();
     
     public EscuchaJugada(Juego juego, InetAddress group, MulticastSocket s){
         this.juego = juego;
@@ -140,6 +149,7 @@ class EscuchaJugada extends Thread{
     public void run(){
         DatagramSocket aSocket = null;
 	   try{
+                String mensaje;
 	    	int serverPort = 6789;
                 aSocket = new DatagramSocket(serverPort); 
 		byte[] buffer = new byte[1000]; // buffer encapsulará mensajes
@@ -147,12 +157,30 @@ class EscuchaJugada extends Thread{
                    System.out.println("Waiting for messages..."); 
  		   DatagramPacket request = new DatagramPacket(buffer, buffer.length);
   		   aSocket.receive(request);
-      System.out.println("Se recibió el mensaje:" + new String(request.getData())+ " from: "+ request.getAddress());
-                   String jugada = new String(request.getData());
+                   mensaje=new String(request.getData());
+                   String jugada = ""+mensaje.charAt(1);
+                   String jugador=""+mensaje.charAt(0);
+                    System.out.println("Se recibió el mensaje:" +jugada+ " from: "+ jugador);
+                   
                    int seleccionado = Integer.parseInt(jugada);
+                   if(seleccionado == juego.getTopo()){
+                       if(hash_table.containsKey(jugador)){
+                           hash_table.put(jugador, hash_table.get(jugador) + 1);
+                           if(hash_table.get(jugador)==JuegoServidor.getPuntaje_meta()){
+                               juego.ganar_ronda(jugador);
+                        String topo = ""+juego.jugar_topo();
+                        byte [] m = topo.getBytes(); 
+                        DatagramPacket messageOut = 
+                               new DatagramPacket(m, m.length, group, 6789);
+                        s.send(messageOut);
+                           }
+                       }else{
+                           hash_table.put(jugador, 1);
+                       }
+                   }
                            
                    
-    		   if(seleccionado == juego.getTopo()){
+    		  /* if(seleccionado == juego.getTopo()){
                         String dir = request.getAddress().toString();
                         String id = juego.buscar_address(dir);
                         juego.ganar_ronda(id);
@@ -162,6 +190,7 @@ class EscuchaJugada extends Thread{
                                new DatagramPacket(m, m.length, group, 6789);
                         s.send(messageOut);  
                    }
+                  */
 		}
 	   }
            catch (SocketException e){

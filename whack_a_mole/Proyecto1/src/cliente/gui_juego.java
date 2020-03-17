@@ -19,6 +19,8 @@ public class gui_juego extends javax.swing.JFrame {
     private static String multiGroup;
     int casilla = 0;
     String posTopo;
+    private int id;
+    private static int consecutivo=1;
     /**
      * Creates new form gui_juego
      */
@@ -26,11 +28,19 @@ public class gui_juego extends javax.swing.JFrame {
         initComponents();
         this.udpSocket = udpSocket;
         this.multiGroup = multiGroup;
-        System.out.print("casilla" +casilla);
-    }
-    gui_juego() {
+        consecutivo++; id=consecutivo;
+        System.out.print("jugador"+id+" consecutivo"+consecutivo);
+        consecutivo++;
         
     }
+    gui_juego() {
+       
+    }
+
+    public int getId() {
+        return id;
+    }
+    
 
     public void setPosTopo(String posTopo) {
         this.posTopo = posTopo;
@@ -318,13 +328,14 @@ public static void main(String args[]) {
 	DatagramSocket aSocket = null;
 	  try {
 		aSocket = new DatagramSocket();    
-		String myMessage = ""+casilla;
+		String myMessage = +id+" "+casilla;
                 byte [] m = myMessage.getBytes();
 		
                 InetAddress aHost = InetAddress.getByName("localhost");
 //                InetAddress aHost = InetAddress.getByAddress("localhost", new byte[] {(byte)148, (byte)205, (byte)199 ,(byte) 100});
 		int serverPort = udpSocket;
     		DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
+                System.out.println(myMessage);
     		aSocket.send(request);			                        	
 	  }
           catch (SocketException e){
