@@ -14,14 +14,19 @@ public class Jugador {
     private int juego;
     private int puntaje;
     private int partidas_ganadas;
+    private String address;
 
-    public Jugador(String id, int juego) {
+    public Jugador(String id, int juego, String address) {
         this.id = id;
         this.juego = juego;
         this.puntaje =0;
         this.partidas_ganadas = 0;
+        this.address = address;
     }
-    
+
+    public String getAddress() {
+        return address;
+    }
     
 
     public String getId() {
