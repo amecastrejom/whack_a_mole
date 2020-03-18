@@ -23,27 +23,26 @@ public class MulticastTablero {
         gui_juego  gui = new gui_juego();
    	 try {
                 InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group 
-	    	s = new MulticastSocket(6789);
+	    	s = new MulticastSocket(6589);
 	   	s.joinGroup(group); 
 
 	    	byte[] buffer = new byte[1000];
  	   	while(sigue) {
-                    System.out.println("Waiting for messages");
+                    System.out.println("Waiting for messages Multicast");
                     DatagramPacket messageIn = 
 			new DatagramPacket(buffer, buffer.length);
  		    s.receive(messageIn);
                     topo=(new String(messageIn.getData()));
-                    System.out.println(topo);
                     gui.setPosTopo(topo);
                     
   	     	}
 	    	s.leaveGroup(group);		
  	    }
          catch (SocketException e){
-             System.out.println("Socket: " + e.getMessage());
+             System.out.println("Socket escucha multicast: " + e.getMessage());
 	 }
          catch (IOException e){
-             System.out.println("IO: " + e.getMessage());
+             System.out.println("IO escucha multicast: " + e.getMessage());
          }
 	 finally {
             if(s != null) s.close();

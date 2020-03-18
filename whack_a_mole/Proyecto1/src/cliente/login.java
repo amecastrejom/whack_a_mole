@@ -76,7 +76,7 @@ public class login extends javax.swing.JFrame {
         if (!usuario.equals("")){
             	Socket s = null;
 	    try {
-	    	int serverPort = 7896;
+	    	int serverPort = 6789;
 	   	
                 s = new Socket("localhost", serverPort);    
              //   s = new Socket("127.0.0.1", serverPort);    
@@ -88,18 +88,18 @@ public class login extends javax.swing.JFrame {
 		int socketNumber = Integer.parseInt(in.readUTF());
                 String group = in.readUTF();
                 
-                new gui_juego(socketNumber,group).setVisible(true); 
+                new gui_juego(7986,group).setVisible(true); 
                 this.dispose();
                     
        	    } 
             catch (UnknownHostException e) {
-		System.out.println("Sock:"+e.getMessage()); 
+		System.out.println("Sock LOGIN:"+e.getMessage()); 
 	    }
             catch (EOFException e) {
-                System.out.println("EOF:"+e.getMessage());
+                System.out.println("EOF LOGIN:"+e.getMessage());
     	    } 
             catch (IOException e) {
-                System.out.println("IO:"+e.getMessage());
+                System.out.println("IO LOGIN:"+e.getMessage());
             } finally {
                 if(s!=null) 
                     try {

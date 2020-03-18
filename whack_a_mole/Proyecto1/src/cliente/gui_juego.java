@@ -20,7 +20,7 @@ public class gui_juego extends javax.swing.JFrame {
     int casilla = 0;
     String posTopo;
     private int id;
-    private static int consecutivo=1;
+    private static int consecutivo=100;
     /**
      * Creates new form gui_juego
      */
@@ -328,21 +328,21 @@ public static void main(String args[]) {
 	DatagramSocket aSocket = null;
 	  try {
 		aSocket = new DatagramSocket();    
-		String myMessage = +id+" "+casilla;
+		String myMessage = +casilla+" "+id;
                 byte [] m = myMessage.getBytes();
 		
                 InetAddress aHost = InetAddress.getByName("localhost");
 //                InetAddress aHost = InetAddress.getByAddress("localhost", new byte[] {(byte)148, (byte)205, (byte)199 ,(byte) 100});
 		int serverPort = udpSocket;
     		DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
-                System.out.println(myMessage);
+                System.out.println("el mensaje que se envia:" +myMessage);
     		aSocket.send(request);			                        	
 	  }
           catch (SocketException e){
-                System.out.println("Socket: " + e.getMessage());
+                System.out.println("Socket casilla: " + e.getMessage());
 	  }
           catch (IOException e){
-              System.out.println("IO: " + e.getMessage());
+              System.out.println("IO casilla: " + e.getMessage());
           }
 	  finally{
             if(aSocket != null) 

@@ -71,15 +71,15 @@ class NuevosJugadores extends Thread{
     @Override
     public void run(){
         try{
-            int serverPort = 7896; 
+            int serverPort = 6789; 
             ServerSocket listenSocket = new ServerSocket(serverPort);
             while(true) {
-                    System.out.println("Waiting for messages..."); 
+                    System.out.println("Waiting for messages LOGIN..."); 
                     Socket clientSocket = listenSocket.accept();  // Listens for a connection to be made to this socket and accepts it. The method blocks until a connection is made. 
                     Connection c = new Connection(juego,clientSocket);
                     c.start();
             }
-	} catch(IOException e) {System.out.println("Listen :"+ e.getMessage());}
+	} catch(IOException e) {System.out.println("Listen error login:"+ e.getMessage());}
     }
     
 }
@@ -88,6 +88,11 @@ class MandarTablero extends Thread{
     private Juego juego;
     private InetAddress group;
     MulticastSocket s;
+    boolean entrar=true;
+
+    public void setEntrar(boolean entrar) {
+        this.entrar = entrar;
+    }
     
     
     public MandarTablero(Juego juego, InetAddress group, MulticastSocket s){
@@ -100,23 +105,22 @@ class MandarTablero extends Thread{
     public void run(){ 
          try {
              
-             while(true){
-                if(juego.numJugadores()>0){
-                    //InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group
+             while(entrar){
+                    InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group
                     int topoActual = juego.getTopo();
                     TimeUnit.SECONDS.sleep(3);
                     if(juego.getTopo() == topoActual){
                         String topo = ""+juego.jugar_topo();
-                        //s = new MulticastSocket(6789);
-                        //s.joinGroup(group); 
+                        System.out.println("voy a enviar el topo:" +topo);
+                        s = new MulticastSocket(6589);
+                        s.joinGroup(group); 
                         //s.setTimeToLive(10);
                         //System.out.println("Messages' TTL (Time-To-Live): "+ s.getTimeToLive());
                         byte [] m = topo.getBytes(); 
                         DatagramPacket messageOut = 
-                               new DatagramPacket(m, m.length, group, 6789);
+                               new DatagramPacket(m, m.length, group, 6589);
                         s.send(messageOut);
                     }
-                }
              }
 
  	}
@@ -150,16 +154,18 @@ class EscuchaJugada extends Thread{
         DatagramSocket aSocket = null;
 	   try{
                 String mensaje;
-	    	int serverPort = 6789;
+                String jugador;
+	    	int serverPort = 7986;
                 aSocket = new DatagramSocket(serverPort); 
 		byte[] buffer = new byte[1000]; // buffer encapsulará mensajes
  		while(true){
-                   System.out.println("Waiting for messages..."); 
+                   System.out.println("Waiting for messages casilla..."); 
  		   DatagramPacket request = new DatagramPacket(buffer, buffer.length);
   		   aSocket.receive(request);
                    mensaje=new String(request.getData());
-                   String jugada = ""+mensaje.charAt(1);
-                   String jugador=""+mensaje.charAt(0);
+                   String jugada = ""+mensaje.charAt(0);
+                   //String jugador=""+mensaje.charAt(2);
+                   jugador=mensaje.substring(2, mensaje.length());
                     System.out.println("Se recibió el mensaje:" +jugada+ " from: "+ jugador);
                    
                    int seleccionado = Integer.parseInt(jugada);
