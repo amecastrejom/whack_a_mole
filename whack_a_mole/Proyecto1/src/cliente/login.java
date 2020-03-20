@@ -36,7 +36,7 @@ public class login extends javax.swing.JFrame {
 
         txtUser = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        lbl = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -55,12 +55,12 @@ public class login extends javax.swing.JFrame {
         });
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(139, 160, 142, 40));
 
-        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText(" Empieza a jugar");
-        jLabel1.setOpaque(true);
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(126, 45, 160, 32));
+        lbl.setBackground(new java.awt.Color(0, 0, 0));
+        lbl.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lbl.setForeground(new java.awt.Color(255, 255, 255));
+        lbl.setText(" Empieza a jugar");
+        lbl.setOpaque(true);
+        getContentPane().add(lbl, new org.netbeans.lib.awtextra.AbsoluteConstraints(126, 45, 160, 32));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cliente/Puntajes.jpg"))); // NOI18N
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 230));
@@ -85,11 +85,23 @@ public class login extends javax.swing.JFrame {
 			new DataOutputStream( s.getOutputStream());
 		out.writeUTF(usuario);        	// UTF is a string encoding 
                 
-		int socketNumber = Integer.parseInt(in.readUTF());
-                String group = in.readUTF();
+                String mensaje = in.readUTF(); 
+                if (mensaje.equals("-1")){
+                    lbl.setText("Servidor lleno");
+                }else{
+                int udpSocket = Integer.parseInt(mensaje.substring(0,4));
+                //System.out.println(udpSocket);
+                mensaje = mensaje.substring(4);
+                int multiSocket = Integer.parseInt(mensaje.substring(0,4));
+                //System.out.println(multiSocket);
+                mensaje = mensaje.substring(4);
+                String multiGroup = mensaje;
+                //System.out.println(multiGroup);
                 
-                new gui_juego(socketNumber,group).setVisible(true); 
+                
+                new gui_juego(udpSocket,multiSocket,multiGroup,usuario).setVisible(true); 
                 this.dispose();
+                }
                     
        	    } 
             catch (UnknownHostException e) {
@@ -147,8 +159,9 @@ public class login extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lbl;
     private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
 }
+
