@@ -14,42 +14,49 @@ public class Juego {
     private int tam;
     private int ocupados;
     private int topo;
-    private int actual;
-    private int partidas;
+    private boolean ganado;
 
-    public Juego(int tam, int partidas) {
+    public Juego(int tam) {
         this.jugadores = new Jugador[tam];
         this.topo=jugar_topo();
-        this.actual=1;
         this.ocupados=0;
         this.tam = tam;
-        this.partidas = partidas;
-    }
-
-    public int getActual() {
-        return actual;
-    }
-
-    public void next_ronda(int juego) {
-        if (juego < partidas){
-            this.actual++;
-            reiniciar();
-            for(int i=0; i < ocupados; i++){
-                jugadores[i].setJuego(juego);
-            }           
-        }else
-            this.actual = 1;
-            reiniciar();
+        this.ganado = false;
     }
     
+    public int getOcupados(){
+        return ocupados;
+    }
     
+    public boolean getGanado(){
+        return ganado;
+    }
     
-    private int buscar_jugador(String id){
-        int resp = -1;
+    public int numJugadores(){
+        return ocupados;
+    }
+    
+    /*public String buscar_address(String address){
+        String resp = "";
         if (ocupados > 0){
             for(int i=0; i < ocupados; i++){
-                if(jugadores[i].getId()== id)
-                resp = i;
+                if(jugadores[i].getAddress()== address)
+                resp = jugadores[i].getId();
+            }
+        }
+        return resp;
+    }*/
+    
+    public int buscar_jugador(String id){
+        int resp = -1;
+        
+        if (ocupados > 0){
+            int i = 0;
+            while(i < ocupados && resp == -1){
+                if(jugadores[i].getId().equals(id)){
+                    resp = i;
+                }
+                i++;
             }
         }
         return resp;
@@ -60,8 +67,9 @@ public class Juego {
         if(ocupados < tam){
             int pos = buscar_jugador(id);
             if(pos == -1){
-                Jugador jug = new Jugador(id,actual);
+                Jugador jug = new Jugador(id);
                 jugadores[ocupados]=jug;
+                ocupados++;
                 resp = 1;//agregado
             }else{
                 resp = 0; //existente
@@ -79,22 +87,6 @@ public class Juego {
                 ocupados--;
             }
         }     
-    }
-   
-    public void reiniciar_jugador(String id){
-        int pos = buscar_jugador(id);
-        if(pos != -1){
-            jugadores[pos].reset();
-        }
-    }
-    
-    public void reiniciar(){
-        this.actual = 1;
-        if (ocupados > 0){
-            for(int i=0; i<ocupados; i++){
-                jugadores[i].reset();
-            }
-        }
     }
     
     public int jugar_topo(){
@@ -115,9 +107,20 @@ public class Juego {
         }     
     }
     
+    public int getMaxPuntaje(){
+        int resp = -1;
+        if (ocupados>0){
+            for (int i=0; i<ocupados; i++){
+                if(jugadores[i].getPuntaje() > resp){
+                    resp = jugadores[i].getPuntaje();
+                }                
+            }
+        }
+        return resp;
+    } 
     
     public String ganador(){
-        String resp ="sin ganador";
+        String resp ="";
         if (ocupados>0){
             int max = -1;
             for (int i=0; i<ocupados; i++){
@@ -126,16 +129,43 @@ public class Juego {
                     resp = jugadores[i].getId();
                 }                
             }
+            ganado = true;
+        }
+        return resp;
+    } 
+    
+    public void restart(){
+        for(int i=0; i<ocupados; i++){
+            jugadores[i].restart();
+        }
+        ganado = false;
+    }
+    
+    public int puntaje_jugador(String id){
+        int resp = -1;
+        if(ocupados > 0){
+            int pos = buscar_jugador(id);
+            if (pos != -1){
+                resp = jugadores[pos].getPuntaje();
+            }
         }
         return resp;
     }
     
-    public boolean validar_topo(int golpeado){
-        boolean resp = false;
-        if (golpeado == topo){
-            resp = true;
+    public int[] getPuntajes(){
+        int[]puntajes = new int[ocupados];
+        for(int i = 0; i < ocupados; i++){
+            puntajes[i] = jugadores[i].getPuntaje();
         }
-        return resp;
+        return puntajes;
+    }
+    
+    public String[] getUsers(){
+        String[]users = new String[ocupados];
+        for(int i = 0; i < ocupados; i++){
+            users[i] = jugadores[i].getId();
+        }
+        return users;
     }
     
 }
