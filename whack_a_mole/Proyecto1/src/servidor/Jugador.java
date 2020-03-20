@@ -11,41 +11,31 @@ package servidor;
  */
 public class Jugador {
     private String id;
-    private int juego;
     private int puntaje;
+    //private String address;
 
-    public Jugador(String id, int juego) {
+    public Jugador(String id) {
         this.id = id;
-        this.juego = juego;
         this.puntaje =0;
+        //this.address = address;
     }
-    
     
 
     public String getId() {
         return id;
     }
 
-    public int getJuego() {
-        return juego;
-    }
-
-    public void setJuego(int juego) {
-        this.juego = juego;
-    }
-
     public int getPuntaje() {
         return puntaje;
     }
-
-    public void reset(){
+    
+    public void restart(){
         puntaje = 0;
-        juego = 0;
     }
     
     public void ganar(){
         puntaje++;
     }  
-    
+   
     
 }
