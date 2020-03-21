@@ -15,15 +15,20 @@ public class Juego {
     private int ocupados;
     private int topo;
     private boolean ganado;
+    private int puntaje_meta;
 
-    public Juego(int tam) {
+    public Juego(int tam, int puntaje_meta) {
         this.jugadores = new Jugador[tam];
         this.topo=jugar_topo();
         this.ocupados=0;
         this.tam = tam;
         this.ganado = false;
+        this.puntaje_meta = puntaje_meta;
     }
-    
+
+    public int getPuntaje_meta() {
+        return puntaje_meta;
+    }
     public int getOcupados(){
         return ocupados;
     }
