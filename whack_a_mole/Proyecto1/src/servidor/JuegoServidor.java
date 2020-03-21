@@ -16,78 +16,103 @@ import java.util.logging.Logger;
  * @author americacastrejon
  */
 public class JuegoServidor {
-    private static Juego juego;
-    private static int tam;
-    private static int puntaje_meta;
+    private Juego juego;
+    private int num_jugadores;
+    private int puntaje_meta;
+    private Juega j;
     
     //para coneccion
-    private static int udpSocket;
-    private static String multiGroup;
-    private static int multiSocket;
-
-    public static void main(String args[]) throws IOException, InterruptedException {
-        tam = 5;    
-        puntaje_meta = 3;
-        juego = new Juego(tam);
-        System.out.println("Topo inicial: "+juego.getTopo());
-        udpSocket = 8000;
-        multiSocket = 8001;
-        multiGroup = "228.5.6.7";
-       
-        
-        
-        //paramulticast(udp)
-        InetAddress group = InetAddress.getByName(multiGroup); // destination multicast group
-        MulticastSocket s = new MulticastSocket(multiSocket);
-        s.joinGroup(group);
-        
-        //para udp (escucha jugadas)
-        DatagramSocket aSocket = new DatagramSocket(udpSocket);
-       
-        StringBuilder sb = new StringBuilder();
-        sb.append(udpSocket);
-        sb.append(multiSocket);
-        sb.append(multiGroup);
-        String mensaje = sb.toString();
-        System.out.println(mensaje);
-        
-        new NuevosJugadores(juego, mensaje).start();
-        new MandarTablero(juego,group,s,multiSocket).start();
-        new EscuchaJugada(juego,aSocket,group,s,multiSocket).start(); 
-        System.out.println(juego.numJugadores());
-        
-        while(true){
-            int puntajeMax = juego.getMaxPuntaje();
-            //TimeUnit.SECONDS.sleep(1);
-            //por alguna razón sin la instrucción del sistema no funciona
-            System.out.print("");
-            if(puntaje_meta == puntajeMax){
-                System.out.println("Partida acabada");
-                juego.ganador();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(baos);
-                
-                //mandar ganador
-                Puntero punt = new Puntero(juego.getUsers(), juego.getPuntajes());
-                punt.setTopo(0);
-                oos.writeObject(punt);
-
-                byte [] m = baos.toByteArray();
-                DatagramPacket messageOut = 
-                       new DatagramPacket(m, m.length, group, multiSocket);
-                s.send(messageOut);
-                TimeUnit.SECONDS.sleep(10);
-                juego.restart();
-                
-            }                      
-        }
-        
-        
-
+    private int udpSocket;
+    private String multiGroup;
+    private int multiSocket;
+    
+    public JuegoServidor(int num_jugadores, int puntaje_meta){
+        this.num_jugadores = num_jugadores;
+        this.puntaje_meta = puntaje_meta;
+        this.udpSocket = 8000;
+        this.multiSocket = 8001;
+        this.multiGroup = "228.5.6.7";
+        j = new Juega();
+        j.start();
     }
     
+    class Juega extends Thread{
+    
+        public void run(){
+            try {
+                juego = new Juego(num_jugadores, puntaje_meta);
+                //System.out.println("Topo inicial: "+juego.getTopo());
+                
+                //paramulticast(udp)
+                InetAddress group = InetAddress.getByName(multiGroup); // destination multicast group
+                MulticastSocket s = new MulticastSocket(multiSocket);
+                s.joinGroup(group);
+                
+                //para udp (escucha jugadas)
+                DatagramSocket aSocket = new DatagramSocket(udpSocket);
+                
+                StringBuilder sb = new StringBuilder();
+                sb.append(udpSocket);
+                sb.append(multiSocket);
+                sb.append(multiGroup);
+                String mensaje = sb.toString();
+                //System.out.println(mensaje);
+                
+                new NuevosJugadores(juego, mensaje).start();
+                new MandarTablero(juego,group,s,multiSocket).start();
+                new EscuchaJugada(juego,aSocket,group,s,multiSocket).start();
+                //System.out.println(juego.numJugadores());
+                
+                while(true){
+                    int puntajeMax = juego.getMaxPuntaje();
+                    //por alguna razón sin la instrucción del system out no funciona
+                    System.out.print("");
+                    if(puntaje_meta == puntajeMax){
+                        //System.out.println("Partida acabada");
+                        juego.ganador();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(baos);
+                        
+                        //mandar ganador
+                        Puntero punt = new Puntero(juego.getUsers(), juego.getPuntajes());
+                        punt.setTopo(0);
+                        oos.writeObject(punt);
+                        
+                        byte [] m = baos.toByteArray();
+                        DatagramPacket messageOut =
+                                new DatagramPacket(m, m.length, group, multiSocket);
+                        s.send(messageOut);
+                        TimeUnit.SECONDS.sleep(6);
+                        juego.restart();
+                                              
+                    }
+                }
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(JuegoServidor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(JuegoServidor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(JuegoServidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }
+    
+    public static void main(String args[]) throws IOException, InterruptedException {
+        //primer int es el número de jugadores máximo
+        //cualquier jugador extra que intente agregarse será avisado en su interfaz que el servidor está lleno
+        //el segundo int es el numero de puntos para ganar
+        JuegoServidor js = new JuegoServidor (5,3);
+        
+        //Se ha comentado todos los system out con los que se regulaba el funcionamiento
+        //para evitar el tiempo que consumen
+    }
+        
+   
     
 }
+
+
 
 class NuevosJugadores extends Thread{
     private Juego juego;
@@ -140,7 +165,7 @@ class MandarTablero extends Thread{
              while(true){
                 //System.out.println("Jugadores activos: "+juego.numJugadores());
                 //if(juego.numJugadores()>0){
-                    System.out.println("Enviando topo automático");
+                    //System.out.println("Enviando topo automático");
                     //InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group
                     int topoActual = juego.getTopo();
                     TimeUnit.SECONDS.sleep(3);
@@ -196,7 +221,7 @@ class EscuchaJugada extends Thread{
 		byte[] buffer = new byte[1000]; // buffer encapsulará mensajes
                 ByteArrayOutputStream baos;
                 ObjectOutputStream oos;
-                System.out.println("Esperando jugadas"); 
+                //System.out.println("Esperando jugadas"); 
  		while(true){
                     System.out.print("");
                     if(!juego.getGanado()){
@@ -207,9 +232,13 @@ class EscuchaJugada extends Thread{
                         int seleccionado = Character.getNumericValue(jugada.charAt(0));
                         int largo = request.getLength();
                         String jugador = jugada.substring(1,largo);//elimina el primer caracter
-                        System.out.println("Jugador: "+jugador+" Golpe: "+ seleccionado);        
+                        //System.out.println("Jugador: "+jugador+" Golpe: "+ seleccionado);
+                        
+                        //debido a los delays en envios, el servido alcanza a jugar un punto mas del que debe
+                        //por ello se coteja aquí que el puntaje maximo no se haya alcanzado
+                        int puntajeMax = juego.getMaxPuntaje();
 
-                        if(seleccionado == juego.getTopo()){
+                        if(seleccionado == juego.getTopo() && puntajeMax < juego.getPuntaje_meta() ){
                              juego.ganar_ronda(jugador);
                              juego.jugar_topo();       
                         }
@@ -271,7 +300,7 @@ class Connection extends Thread {
                 //System.out.println("Message received from: " + dir);
                 
                 int aceptado = juego.agregar_jugador(data);                
-                System.out.println("pos: "+juego.buscar_jugador(data));
+                //System.out.println("pos: "+juego.buscar_jugador(data));
                 
                 if (aceptado != -1 ){
                     System.out.println("jugador aceptado: "+data);
@@ -294,5 +323,3 @@ class Connection extends Thread {
                 }
             }
     }
-
-
