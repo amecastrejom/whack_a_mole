@@ -29,7 +29,7 @@ public class HiloCliente extends Thread{
     
     @Override
     public void run(){
-        System.out.println("entro al run");
+        System.out.println(usuario+ "jugando");
         Socket s = null;
 	    try {
                 
@@ -42,7 +42,7 @@ public class HiloCliente extends Thread{
 		DataOutputStream out =
 			new DataOutputStream( s.getOutputStream());
 		out.writeUTF(usuario);        	// UTF is a string encoding 
-                System.out.println("Mensaje enviado");
+                //System.out.println("Mensaje enviado");
                 
                 String mensaje = in.readUTF(); 
                 if (!mensaje.equals("-1")){
@@ -75,11 +75,12 @@ public class HiloCliente extends Thread{
                         //Castea el objeto recibido y obtiene el topo asignado
                         Puntero punt = (Puntero)readObject;
                         topo_activo = punt.getTopo();
-                        System.out.println("llego topo "+topo_activo);
+                        System.out.println(usuario+" llego topo "+topo_activo);
                         
                         if (topo_activo == 0){
                             //si el topo es 0 el juego ha acabado
                             ganador = punt.ganador();
+                            System.out.println("ganó el jugador: "+ganador);
                             
                             //no opera nada porque eso es en la interfaz
                             //y no compete a las mediciones de estres de las conexiones
@@ -102,7 +103,7 @@ public class HiloCliente extends Thread{
                             //delay en dar click
                             int segs = 1+(int)(Math.random() * 3);
                             TimeUnit.SECONDS.sleep(segs);
-                            System.out.println("golpe topo "+topo_activo);
+                            System.out.println(usuario+" golpe topo "+topo_activo);
                             aSocket.send(request);	
                         }
 
