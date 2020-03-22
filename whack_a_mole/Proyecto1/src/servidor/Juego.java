@@ -16,6 +16,7 @@ public class Juego {
     private int topo;
     private boolean ganado;
     private int puntaje_meta;
+    private boolean modificado;
 
     public Juego(int tam, int puntaje_meta) {
         this.jugadores = new Jugador[tam];
@@ -24,11 +25,21 @@ public class Juego {
         this.tam = tam;
         this.ganado = false;
         this.puntaje_meta = puntaje_meta;
+        this.modificado = false;
     }
 
     public int getPuntaje_meta() {
         return puntaje_meta;
     }
+    
+    public boolean topoModificado(){
+        return modificado;
+    }
+    
+    public void resetModificado(){
+        this.modificado = false;
+    }
+    
     public int getOcupados(){
         return ocupados;
     }
@@ -96,6 +107,7 @@ public class Juego {
     
     public int jugar_topo(){
         this.topo = 1 + (int)(Math.random() * 9);
+        this.modificado = true;
         return topo;
     }
 
@@ -135,6 +147,7 @@ public class Juego {
                 }                
             }
             ganado = true;
+            modificado = true;
         }
         return resp;
     } 
@@ -144,6 +157,7 @@ public class Juego {
             jugadores[i].restart();
         }
         ganado = false;
+        modificado = false;
     }
     
     public int puntaje_jugador(String id){
