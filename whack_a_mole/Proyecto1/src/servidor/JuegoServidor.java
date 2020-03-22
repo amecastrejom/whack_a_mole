@@ -82,8 +82,8 @@ public class JuegoServidor {
                         DatagramPacket messageOut =
                                 new DatagramPacket(m, m.length, group, multiSocket);
                         s.send(messageOut);
-                        TimeUnit.SECONDS.sleep(6);
-                        juego.restart();
+                        //TimeUnit.SECONDS.sleep(6);
+                        //juego.restart();
                                               
                     }
                 }
@@ -91,9 +91,9 @@ public class JuegoServidor {
                 Logger.getLogger(JuegoServidor.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(JuegoServidor.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
+            }/* catch (InterruptedException ex) {
                 Logger.getLogger(JuegoServidor.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
 
         }
     }
@@ -164,25 +164,24 @@ class MandarTablero extends Thread{
             ObjectOutputStream oos;
              while(true){
                 //System.out.println("Jugadores activos: "+juego.numJugadores());
-                //if(juego.numJugadores()>0){
-                    //System.out.println("Enviando topo automático");
-                    //InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group
-                    int topoActual = juego.getTopo();
-                    TimeUnit.SECONDS.sleep(3);
-                    if(juego.getTopo() == topoActual && juego.getGanado() == false){
-                        baos = new ByteArrayOutputStream();
-                        oos = new ObjectOutputStream(baos);
-                        Puntero punt = new Puntero(juego.getUsers(), juego.getPuntajes());
-                        punt.setTopo(juego.jugar_topo());
-                        oos.writeObject(punt);
-                        
-                        byte [] m = baos.toByteArray();
-                        DatagramPacket messageOut = 
-                               new DatagramPacket(m, m.length, group, multiSocket);
-                        s.send(messageOut);
-                    }
-                //}
-             }
+                //System.out.println("Enviando topo automático");
+                //InetAddress group = InetAddress.getByName("228.5.6.7"); // destination multicast group
+                TimeUnit.SECONDS.sleep(3);
+                System.out.print("");
+                if(juego.numJugadores() > 0 && juego.topoModificado() == false){
+                    baos = new ByteArrayOutputStream();
+                    oos = new ObjectOutputStream(baos);
+                    Puntero punt = new Puntero(juego.getUsers(), juego.getPuntajes());
+                    punt.setTopo(juego.jugar_topo());
+                    System.out.println("Topo enviado automatico: "+juego.getTopo());
+                    oos.writeObject(punt); 
+                    byte [] m = baos.toByteArray();
+                    DatagramPacket messageOut = 
+                           new DatagramPacket(m, m.length, group, multiSocket);
+                    s.send(messageOut);
+                    juego.resetModificado();
+                }
+            }
 
  	}
          catch (SocketException e){
@@ -237,21 +236,25 @@ class EscuchaJugada extends Thread{
                         //debido a los delays en envios, el servido alcanza a jugar un punto mas del que debe
                         //por ello se coteja aquí que el puntaje maximo no se haya alcanzado
                         int puntajeMax = juego.getMaxPuntaje();
+                        System.out.println();
 
                         if(seleccionado == juego.getTopo() && puntajeMax < juego.getPuntaje_meta() ){
                              juego.ganar_ronda(jugador);
-                             juego.jugar_topo();       
-                        }
-                        baos = new ByteArrayOutputStream();
-                        oos = new ObjectOutputStream(baos);
-                        Puntero punt = new Puntero(juego.getUsers(), juego.getPuntajes());
-                         punt.setTopo(juego.getTopo());
-                         oos.writeObject(punt);
+                             juego.jugar_topo();  
+                             baos = new ByteArrayOutputStream();
+                             oos = new ObjectOutputStream(baos);
+                             Puntero punt = new Puntero(juego.getUsers(), juego.getPuntajes());
+                             System.out.println("Topo enviado: "+juego.getTopo());
+                             punt.setTopo(juego.getTopo());
+                             oos.writeObject(punt);
 
-                         byte [] m = baos.toByteArray();
-                         DatagramPacket messageOut = 
-                                new DatagramPacket(m, m.length, group, multiSocket);
-                         s.send(messageOut);
+                             byte [] m = baos.toByteArray();
+                             DatagramPacket messageOut = 
+                                    new DatagramPacket(m, m.length, group, multiSocket);
+                             s.send(messageOut);
+                        }
+                        
+                        
                     }
 		}
 	   }
@@ -323,3 +326,4 @@ class Connection extends Thread {
                 }
             }
     }
+
